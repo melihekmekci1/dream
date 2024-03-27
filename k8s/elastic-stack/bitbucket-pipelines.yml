@@ -1,0 +1,97 @@
+definitions:
+  steps:
+    - step: &deploy-elasticsearch
+        name: Deploy Elasticsearch to Monitoring AKS
+        image: alpine/git
+        script:
+          - pipe: atlassian/azure-aks-helm-deploy:2.0.0
+            variables:
+              AZURE_APP_ID: $AZURE_APP_ID
+              AZURE_PASSWORD: $AZURE_PASSWORD
+              AZURE_TENANT_ID: $AZURE_TENANT_ID
+              AZURE_AKS_NAME: $AZURE_AKS_NAME
+              AZURE_RESOURCE_GROUP: $AZURE_RESOURCE_GROUP
+              HELM_VERSION: 'v3.13.3'
+              HELM_RELEASE_NAME: 'elasticsearch'
+              HELM_CHART_NAME: 'elasticsearch'
+              HELM_CHART_DIR: '/opt/atlassian/pipelines/agent/build/elasticsearch'
+              HELM_COMMAND: 'dependency build /opt/atlassian/pipelines/agent/build/elasticsearch'
+          - pipe: atlassian/azure-aks-helm-deploy:2.0.0
+            variables:
+              AZURE_APP_ID: $AZURE_APP_ID
+              AZURE_PASSWORD: $AZURE_PASSWORD
+              AZURE_TENANT_ID: $AZURE_TENANT_ID
+              AZURE_AKS_NAME: $AZURE_AKS_NAME
+              AZURE_RESOURCE_GROUP: $AZURE_RESOURCE_GROUP
+              HELM_VERSION: 'v3.13.3'
+              HELM_RELEASE_NAME: 'elasticsearch'
+              HELM_CHART_NAME: 'elasticsearch'
+              HELM_CHART_DIR: '/opt/atlassian/pipelines/agent/build/elasticsearch'
+              HELM_COMMAND: 'upgrade -n logging elasticsearch /opt/atlassian/pipelines/agent/build/elasticsearch'
+    - step: &fluent-bit-deploy
+        name: Deploy fluent-bit to Monitoring AKS
+        image: alpine/git
+        script:
+          - pipe: atlassian/azure-aks-helm-deploy:2.0.0
+            variables:
+              AZURE_APP_ID: $AZURE_APP_ID
+              AZURE_PASSWORD: $AZURE_PASSWORD
+              AZURE_TENANT_ID: $AZURE_TENANT_ID
+              AZURE_AKS_NAME: $AZURE_AKS_NAME
+              AZURE_RESOURCE_GROUP: $AZURE_RESOURCE_GROUP
+              HELM_VERSION: 'v3.13.3'
+              HELM_RELEASE_NAME: 'fluent-bit'
+              HELM_CHART_NAME: 'fluent-bit'
+              HELM_CHART_DIR: '/opt/atlassian/pipelines/agent/build/fluent-bit'
+              HELM_COMMAND: 'dependency build /opt/atlassian/pipelines/agent/build/fluent-bit'
+          - pipe: atlassian/azure-aks-helm-deploy:2.0.0
+            variables:
+              AZURE_APP_ID: $AZURE_APP_ID
+              AZURE_PASSWORD: $AZURE_PASSWORD
+              AZURE_TENANT_ID: $AZURE_TENANT_ID
+              AZURE_AKS_NAME: $AZURE_AKS_NAME
+              AZURE_RESOURCE_GROUP: $AZURE_RESOURCE_GROUP
+              HELM_VERSION: 'v3.13.3'
+              HELM_RELEASE_NAME: 'fluent-bit'
+              HELM_CHART_NAME: 'fluent-bit'
+              HELM_CHART_DIR: '/opt/atlassian/pipelines/agent/build/fluent-bit'
+              HELM_COMMAND: 'upgrade -n logging fluent-bit /opt/atlassian/pipelines/agent/build/fluent-bit'
+        
+    - step: &kibana-deploy
+        name: Deploy fluent-bit to Monitoring AKS
+        image: alpine/git
+        script:
+          - pipe: atlassian/azure-aks-helm-deploy:2.0.0
+            variables:
+              AZURE_APP_ID: $AZURE_APP_ID
+              AZURE_PASSWORD: $AZURE_PASSWORD
+              AZURE_TENANT_ID: $AZURE_TENANT_ID
+              AZURE_AKS_NAME: $AZURE_AKS_NAME
+              AZURE_RESOURCE_GROUP: $AZURE_RESOURCE_GROUP
+              HELM_VERSION: 'v3.13.3'
+              HELM_RELEASE_NAME: 'kibana'
+              HELM_CHART_NAME: 'kibana'
+              HELM_CHART_DIR: '/opt/atlassian/pipelines/agent/build/kibana'
+              HELM_COMMAND: 'dependency build /opt/atlassian/pipelines/agent/build/kibana'
+          - pipe: atlassian/azure-aks-helm-deploy:2.0.0
+            variables:
+              AZURE_APP_ID: $AZURE_APP_ID
+              AZURE_PASSWORD: $AZURE_PASSWORD
+              AZURE_TENANT_ID: $AZURE_TENANT_ID
+              AZURE_AKS_NAME: $AZURE_AKS_NAME
+              AZURE_RESOURCE_GROUP: $AZURE_RESOURCE_GROUP
+              HELM_VERSION: 'v3.13.3'
+              HELM_RELEASE_NAME: 'kibana'
+              HELM_CHART_NAME: 'kibana'
+              HELM_CHART_DIR: '/opt/atlassian/pipelines/agent/build/kibana'
+              HELM_COMMAND: 'upgrade -n logging kibana /opt/atlassian/pipelines/agent/build/kibana'    
+
+
+pipelines:
+  custom:
+    elasticsearch-deploy:
+      - step: *deploy-elasticsearch
+    fluent-bit-deploy:
+      - step: *fluent-bit-deploy
+    kibana-deploy:
+      - step: *kibana-deploy
