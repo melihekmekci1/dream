@@ -1,0 +1,7 @@
+---
+- name: Apply Kubernetes Manifests
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Apply Manifests
+      command: helm upgrade java-release ../k8s/app-java --install
