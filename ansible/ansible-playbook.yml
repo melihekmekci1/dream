@@ -4,4 +4,4 @@
   gather_facts: no
   tasks:
     - name: Apply Manifests
-      command: helm upgrade java-release ../k8s/app-java --install
+      command: helm upgrade java-release ../k8s/app-java -n default --install
