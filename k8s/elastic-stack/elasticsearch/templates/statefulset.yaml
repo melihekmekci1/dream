@@ -40,6 +40,8 @@ spec:
 {{ toYaml . | indent 8 }}
     {{- end }}
     spec:
+      accessModes: "ReadWriteOnce" 
+      storageClassName: elastic-pv
 {{ toYaml .Values.volumeClaimTemplate | indent 6 }}
   {{- end }}
   template:

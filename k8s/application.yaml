@@ -1,0 +1,8 @@
+project: default
+source:
+  repoURL: 'https://github.com/melihekmekci1/dream.git'
+  path: k8s/kube-prometheus-stack
+  targetRevision: HEAD
+destination:
+  server: 'https://kubernetes.default.svc'
+  namespace: monitoring

@@ -112,30 +112,14 @@ extraEnvs:
 ```
 
 ```
-kibanaConfig:
-   kibana.yml: |
-     server.publicBaseUrl: https://kibana.solviads.cloud:5601
+
 ```
 
 > Creating ingress for accessing kibana from outside
 
 ```
-ingress:
-  enabled: true
-  className: "nginx"
-  pathtype: ImplementationSpecific
-  annotations:
-    nginx.ingress.kubernetes.io/whitelist-source-range: "195.142.136.241/29"
-  # kubernetes.io/ingress.class: nginx
-  # kubernetes.io/tls-acme: "true"
-  hosts:
-    - host: kibana.solviads.cloud
-      paths:
-        - path: /
-  tls:
-    - secretName: slv-cert-october-10-2023
-      hosts:
-        - kibana.solviads.cloud
+
+
 ```
 
 ```

@@ -1143,7 +1143,7 @@ grafana:
     interval: ""
     scheme: http
     tlsConfig: {}
-    scrapeTimeout: 30s
+    scrapeTimeout: 35s
 
     ## RelabelConfigs to apply to samples before scraping
     ## ref: https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#relabelconfig

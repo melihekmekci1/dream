@@ -387,7 +387,7 @@ config:
         Name tail
         Tag kube.*
         Path /var/log/containers/*.log
-        Exclude_Path /var/log/containers/alertmanager*, /var/log/containers/argocd*, /var/log/containers/azure-ip*, /var/log/containers/coredns*, /var/log/containers/csi*, /var/log/containers/konnectivity-agent*, /var/log/containers/kube-proxy*, /var/log/containers/metrics-server*, /var/log/containers/pritunl*, /var/log/containers/cloud-node-manager*, /var/log/pods/kube-system_metrics*, /var/log/pods/kube-system*, /var/log/containers/overlay-vpa*, /var/log/containers/vpa*, /var/log/containers/gatekeeper*, /var/log/containers/fluent-bit*
+        Exclude_Path /var/log/containers/alertmanager*, /var/log/containers/argocd*, /var/log/containers/coredns*, /var/log/containers/konnectivity-agent*, /var/log/containers/kube-proxy*, /var/log/containers/cloud-node-manager*, /var/log/pods/kube-system_metrics*, /var/log/pods/kube-system*, /var/log/containers/overlay-vpa*, /var/log/containers/vpa*, /var/log/containers/gatekeeper*, /var/log/containers/fluent-bit*
         Parser docker
         Mem_Buf_Limit 5MB
         Skip_Long_Lines Off
@@ -438,8 +438,8 @@ config:
     [OUTPUT]
         Name es
         Match kube.*
-        Host 10.160.0.5
-        Port 30036
+        Host elasticsearch-master
+        Port 9200
         HTTP_User elastic
         HTTP_Passwd WygDjB3Cq5frxeNv
         Logstash_Format On
@@ -449,14 +449,14 @@ config:
         Replace_Dots On
         Retry_Limit     10
         type text
-        
+        Suppress_Type_Name On
         
 
     [OUTPUT]
         Name es
         Match host.*
-        Host 10.160.0.5
-        Port 30036
+        Host elasticsearch-master
+        Port 9200
         HTTP_User elastic
         HTTP_Passwd WygDjB3Cq5frxeNv
         Logstash_Format On
@@ -466,7 +466,8 @@ config:
         Replace_Dots On
         Retry_Limit     10
         type text
-     
+        Suppress_Type_Name On
+
 
   ## https://docs.fluentbit.io/manual/administration/configuring-fluent-bit/classic-mode/upstream-servers
   ## This configuration is deprecated, please use `extraFiles` instead.

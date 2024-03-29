@@ -73,8 +73,6 @@ healthCheckPath: "/app/kibana"
 # Allows you to add any config files in /usr/share/kibana/config/
 # such as kibana.yml
 kibanaConfig:
-   kibana.yml: |
-     server.publicBaseUrl: https://kibana.solviads.cloud:5601
 #   kibana.yml: |
 #     key:
 #       nestedkey: value
@@ -129,7 +127,7 @@ updateStrategy:
   type: "Recreate"
 
 service:
-  type: ClusterIP
+  type: NodePort
   loadBalancerIP: ""
   port: 5601
   nodePort: ""
@@ -154,14 +152,7 @@ ingress:
     nginx.ingress.kubernetes.io/whitelist-source-range: "195.142.136.241/29"
   # kubernetes.io/ingress.class: nginx
   # kubernetes.io/tls-acme: "true"
-  hosts:
-    - host: kibana.solviads.cloud
-      paths:
-        - path: /
-  tls:
-    - secretName: slv-cert-october-10-2023
-      hosts:
-        - kibana.solviads.cloud
+  hosts: []
 
 readinessProbe:
   failureThreshold: 3

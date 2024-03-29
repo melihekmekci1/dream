@@ -26,7 +26,7 @@ clusterDeprecationIndexing: "false"
 # such as elasticsearch.yml and log4j2.properties
 esConfig:
   elasticsearch.yml: |
-    xpack.security.enabled: true
+    xpack.security.enabled: false
     
   
 #  elasticsearch.yml: |
@@ -115,7 +115,7 @@ volumeClaimTemplate:
   accessModes: ["ReadWriteOnce"]
   resources:
     requests:
-      storage: 100Gi
+      storage: 2Gi
 
 rbac:
   create: false
@@ -243,7 +243,7 @@ sysctlVmMaxMapCount: 262144
 
 readinessProbe:
   failureThreshold: 3
-  initialDelaySeconds: 10
+  initialDelaySeconds: 120
   periodSeconds: 10
   successThreshold: 3
   timeoutSeconds: 5
@@ -257,7 +257,8 @@ clusterHealthCheckParams: "wait_for_status=green&timeout=1s"
 schedulerName: ""
 
 imagePullSecrets: []
-nodeSelector: {}
+nodeSelector: 
+  kubernetes.io/hostname: node01
 tolerations: []
 
 # Enabling this will publicly expose your Elasticsearch instance.
