@@ -2,6 +2,8 @@
 - name: Apply Kubernetes Manifests
   hosts: localhost
   gather_facts: no
+  vars:
+    image_tag: "latest" # Default value in case it's not passed
   tasks:
     - name: Apply Manifests
-      command: helm upgrade java-release ../k8s/app-java -n default --install
+      command: helm upgrade java-release ../k8s/app-java -n default --install --set image.tag={{ image_tag }}
