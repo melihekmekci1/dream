@@ -2350,16 +2350,16 @@ prometheusOperator:
       ## Define which Nodes the Pods are scheduled on.
       ## ref: https://kubernetes.io/docs/user-guide/node-selection/
       ##
-      nodeSelector: {}
-
+      nodeSelector: 
+        kubernetes.io/hostname: controlplane
       ## Tolerations for use with node taints
       ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
       ##
-      tolerations: []
-      # - key: "key"
-      #   operator: "Equal"
-      #   value: "value"
-      #   effect: "NoSchedule"
+      tolerations: 
+      - key: "key"
+        operator: "Equal"
+        value: "value"
+        effect: "NoSchedule"
 
       ## Assign custom affinity rules to the prometheus operator
       ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
