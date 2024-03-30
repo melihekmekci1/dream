@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-x
+spec:
+  replicas: 2 # Initial replica count
+  selector:
+    matchLabels:
+      app: app-x
+  template:
+    metadata:
+      labels:
+        app: app-x
+    spec:
+      containers:
+      - name: app-x-container
+        image: app-x-image
+        resources:
+          requests:
+            cpu: "500m"
+          limits:
+            cpu: "1"
+      priorityClassName: high-priority
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: app-x-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: app-x
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80

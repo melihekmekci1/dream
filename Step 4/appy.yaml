@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-y
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app-y
+  template:
+    metadata:
+      labels:
+        app: app-y
+    spec:
+      containers:
+      - name: app-y-container
+        image: app-y-image
+        resources:
+          requests:
+            cpu: "100m"
+          limits:
+            cpu: "500m"
+      priorityClassName: low-priority
