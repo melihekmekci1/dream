@@ -1,0 +1,97 @@
+pipeline {
+    agent {
+        kubernetes {
+            yaml '''
+            apiVersion: v1
+            kind: Pod
+            metadata:
+              name: build-pipeline
+            spec:
+              containers:
+              - name: maven
+                image: maven:alpine
+                command:
+                - cat
+                tty: true
+              - name: docker
+                image: docker:24.0.0-rc.1-dind
+                securityContext:
+                  privileged: true
+              - name: ansible
+                image: alpinelinux/ansible
+                command: ["/bin/sh", "-c"]
+                args:
+                  - >
+                    wget https://get.helm.sh/helm-v3.5.0-linux-amd64.tar.gz &&
+                    tar -zxvf helm-v3.5.0-linux-amd64.tar.gz &&
+                    mv linux-amd64/helm /usr/local/bin/helm &&
+                    /bin/sleep infinity
+
+            '''
+        }
+    }
+    environment {
+        TIMESTAMP = "${new java.text.SimpleDateFormat('yyyyMMdd').format(new Date())}"
+        BUILD_TAG = "${env.BUILD_NUMBER}-${TIMESTAMP}"
+    }
+    stages {
+        stage('Clone') {
+            steps {
+                container('maven') {
+                    git branch: 'main', changelog: false, poll: false, url: 'https://github.com/melihekmekci1/dream.git'
+                }
+            }
+        }
+        stage('Build Jar file') {
+            steps {
+                container('maven') {
+                    dir('java-app') {
+                        sh 'chmod 777 mvnw'
+                        sh 'mvn clean package'
+                    }
+                }
+            }
+        }
+        stage('Build Docker Image') {
+            steps {
+                container('docker') {
+                    dir('java-app') {
+                        sh 'docker build -t melihekmekci/samplejavaapp:${BUILD_TAG} .'
+                    }
+                }
+            }
+        }
+        stage('Login Into Docker') {
+            steps {
+                container('docker') {
+                    script {
+                        withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+                            sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
+                        }
+                    }
+                }
+            }
+        }
+        stage('Push Images Docker to DockerHub') {
+            steps {
+                container('docker') {
+                    sh 'docker push melihekmekci/samplejavaapp:${BUILD_TAG}'
+                }
+            }
+        }
+        stage('Deploy to Kubernetes') {
+            steps {
+                container('ansible') {
+                    dir('ansible') {
+                      withCredentials([file(credentialsId: 'my-kubeconfig', variable: 'KUBECONFIG')]) {
+                        sh 'helm ls'
+                        sh 'ansible-playbook ansible-playbook.yml -e "image_tag=${BUILD_TAG}"'
+                        
+                      }                       
+                    }
+                }
+            } 
+        }
+    }
+
+}

@@ -51,14 +51,18 @@ spec:
               containerPort: {{ .Values.service.port }}
               protocol: TCP
           readinessProbe:
-            tcpSocket:
-              port: 9001
-            initialDelaySeconds: 15
+            exec:
+              command:
+              - ls
+              - /
+            initialDelaySeconds: 5
             periodSeconds: 10
           livenessProbe:
-            tcpSocket:
-              port: 9001
-            initialDelaySeconds: 15
+            exec:
+              command:
+              - ls
+              - /
+            initialDelaySeconds: 5
             periodSeconds: 10
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
