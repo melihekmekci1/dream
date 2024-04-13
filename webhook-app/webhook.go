@@ -8,13 +8,12 @@ import (
     "os"
 
     v1 "k8s.io/api/apps/v1"
-    admissionv1beta1 "k8s.io/api/admission/v1beta1"
+    admissionv1 "k8s.io/api/admission/v1"
     metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
     "k8s.io/apimachinery/pkg/runtime"
     "k8s.io/apimachinery/pkg/runtime/serializer"
 )
 
-// Setup global serializer for decoding the AdmissionReview requests
 var codecs = serializer.NewCodecFactory(runtime.NewScheme())
 
 func handleAdmissionReview(w http.ResponseWriter, r *http.Request) {
@@ -24,8 +23,7 @@ func handleAdmissionReview(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    // Parse the AdmissionReview request.
-    var admissionReviewReq admissionv1beta1.AdmissionReview
+    var admissionReviewReq admissionv1.AdmissionReview
     deserializer := codecs.UniversalDeserializer()
     _, _, err = deserializer.Decode(body, nil, &admissionReviewReq)
     if err != nil {
@@ -33,7 +31,6 @@ func handleAdmissionReview(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    // Extract the Deployment from the request.
     raw := admissionReviewReq.Request.Object.Raw
     var deployment v1.Deployment
     if err := json.Unmarshal(raw, &deployment); err != nil {
@@ -41,15 +38,17 @@ func handleAdmissionReview(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    // Prepare the response object
-    response := admissionv1beta1.AdmissionReview{
-        Response: &admissionv1beta1.AdmissionResponse{
+    response := admissionv1.AdmissionReview{
+        TypeMeta: metav1.TypeMeta{
+            APIVersion: "admission.k8s.io/v1",
+            Kind:       "AdmissionReview",
+        },
+        Response: &admissionv1.AdmissionResponse{
             UID:     admissionReviewReq.Request.UID,
             Allowed: true,
         },
     }
 
-    // Check if resource requests are specified.
     for _, container := range deployment.Spec.Template.Spec.Containers {
         if container.Resources.Requests == nil {
             response.Response.Allowed = false
@@ -60,12 +59,12 @@ func handleAdmissionReview(w http.ResponseWriter, r *http.Request) {
         }
     }
 
-    // Send the response.
     respBytes, err := json.Marshal(response)
     if err != nil {
         http.Error(w, fmt.Sprintf("could not marshal response: %v", err), http.StatusInternalServerError)
         return
     }
+    w.Header().Set("Content-Type", "application/json")
     w.Write(respBytes)
 }
 

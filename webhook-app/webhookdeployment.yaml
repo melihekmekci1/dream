@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: webhook-server
-        image: melihekmekci/webhookapp:3
+        image: melihekmekci/webhookapp:5
         ports:
         - containerPort: 443
         volumeMounts:
